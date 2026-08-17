@@ -5,13 +5,16 @@ A small dynamic terminal UI for managing Hermes Agent's **Gateway / Telegram** a
 ## Features
 
 - Detects the current `hermes` executable automatically.
-- Shows Gateway and Dashboard state, enablement, PID, and dashboard port state.
-- Start / stop / restart the selected service.
+- Shows Gateway and Dashboard state, enablement, PID, and the dashboard port owner.
+- Streams selected service logs live from `journalctl --follow`.
+- Inspects port conflicts with listening address, PID, and process name.
+- Edits the dashboard port and safely restarts an active dashboard after updating its unit.
+- Selects a Hermes profile without changing Hermes' sticky CLI default; generated units use that profile's `HERMES_HOME`.
+- Reports local Telegram configuration health without exposing credentials.
+- Diagnoses WSL/systemd auto-start readiness, user-manager health, and lingering.
 - Generates and updates `~/.config/systemd/user/` unit files.
 - Uses `hermes gateway run --external-supervisor` so systemd owns restart behavior.
-- Uses `hermes dashboard --host 127.0.0.1 --port 9119 --no-open`.
-- Shows recent `journalctl --user` logs inside the TUI.
-- Refreshes service state automatically every 2 seconds.
+- Packages as a standalone Linux/WSL binary with PyInstaller.
 
 ## Prerequisites
 
@@ -79,11 +82,13 @@ python -m hermes_service_tui
 | Key | Action |
 |---|---|
 | `↑` / `↓` | Select Gateway or Dashboard |
-| `i` | Install/update systemd units |
+| `i` | Install/update systemd units using the selected profile and port |
 | `s` | Start selected service |
 | `x` | Stop selected service |
 | `e` | Restart selected service |
-| `l` | Refresh selected service logs |
+| `l` | Start/stop the selected service's live journal stream |
+| `p` | Focus the dashboard port editor; press **Apply Port** to save/restart |
+| `d` | Show Telegram, port-owner, and WSL auto-start diagnostics |
 | `r` | Refresh status |
 | `q` | Quit |
 
@@ -231,12 +236,33 @@ systemctl --user restart hermes-gateway.service
 .venv/bin/python -m pytest -q
 ```
 
-## Suggested v0.2
+## How to: use profiles, ports, and diagnostics
 
-- Live streaming journal instead of snapshot logs.
-- Port conflict inspector with PID/process details.
-- Dashboard port editor.
-- Hermes profile selector.
-- Telegram configuration health check.
-- WSL auto-start diagnostics.
-- Package as a standalone binary with PyInstaller or Nuitka.
+1. Select a profile from **Profile**. This changes only the unit configuration; it does not run `hermes profile use` or change your normal CLI default.
+2. Enter a port from `1` to `65535` and select **Apply Port**. The TUI rejects a port owned by another visible process and shows its PID/process name.
+3. Press `l` on either service to follow its journal live. Press `l` again to stop.
+4. Press `d` to inspect the selected profile's local Telegram credential presence, the dashboard port owner, and WSL auto-start readiness. Credential values never appear in the TUI.
+
+Profiles use Hermes' documented `HERMES_HOME` isolation. Selecting `coder`, for example, writes `HERMES_HOME=~/.hermes/profiles/coder` to both generated unit files.
+
+## How to: build a standalone binary
+
+Build a self-contained Linux/WSL executable with PyInstaller:
+
+```bash
+./scripts/build-binary.sh
+```
+
+The script installs only the `build` extra into this project's `.venv`, then produces:
+
+```text
+dist/hermes-service-tui
+```
+
+Run the artifact on the same target family used to build it:
+
+```bash
+./dist/hermes-service-tui
+```
+
+PyInstaller binaries are OS-specific. Build separately on Linux/WSL, macOS, and Windows if you add support for those targets.
