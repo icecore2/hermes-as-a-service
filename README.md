@@ -2,6 +2,12 @@
 
 A small dynamic terminal UI for managing Hermes Agent's **Gateway / Telegram** and **Web Dashboard** as `systemd --user` services under WSL2 or Linux.
 
+## Screenshots
+
+![Hermes Service TUI Screenshot](/screenshots/hermes-service-logs.png)
+
+![Hermes Service TUI Diagnostics Screenshot](/screenshots/hermes-service-diagnostics.png)
+
 ## Features
 
 - Detects the current `hermes` executable automatically.
