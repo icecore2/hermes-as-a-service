@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "hermes-service-tui"
-version = "0.2.0"
+version = "1.0.0"
 description = "Dynamic TUI for managing profile-aware Hermes Agent systemd user services on WSL2/Linux"
 readme = "README.md"
 requires-python = ">=3.10"

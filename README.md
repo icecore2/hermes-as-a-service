@@ -263,6 +263,8 @@ The script installs only the `build` extra into this project's `.venv`, then pro
 
 ```text
 dist/hermes-service-tui
+release/hermes-service-tui-<version>-linux-x86_64.tar.gz
+release/hermes-service-tui-<version>-linux-x86_64.tar.gz.sha256
 ```
 
 Run the artifact on the same target family used to build it:
@@ -270,5 +272,9 @@ Run the artifact on the same target family used to build it:
 ```bash
 ./dist/hermes-service-tui
 ```
+
+For deployment, copy the versioned archive to the target Linux/WSL x86-64 system,
+verify it with `sha256sum -c <archive>.sha256`, extract it, and run the bundled
+`hermes-service-tui` executable. The archive also includes the README and license.
 
 PyInstaller binaries are OS-specific. Build separately on Linux/WSL, macOS, and Windows if you add support for those targets.
